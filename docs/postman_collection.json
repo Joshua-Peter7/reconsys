@@ -1,0 +1,148 @@
+{
+  "info": {
+    "name": "Smart Reconciliation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for Smart Reconciliation & Audit System"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "uploadJobId", "value": "" },
+    { "key": "recordId", "value": "" },
+    { "key": "resultId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"analyst@recons.local\",\n  \"password\": \"Analyst@123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Auth - Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/auth/profile"
+      }
+    },
+    {
+      "name": "Upload - Preview",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "file", "type": "file", "src": "sample-data/sample_transactions.csv" }
+          ]
+        },
+        "url": "{{baseUrl}}/upload/preview"
+      }
+    },
+    {
+      "name": "Upload - Create Job",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "file", "type": "file", "src": "sample-data/sample_transactions.csv" },
+            { "key": "uploadType", "type": "text", "value": "transaction" },
+            {
+              "key": "columnMapping",
+              "type": "text",
+              "value": "{\"Transaction ID\":\"transactionId\",\"Reference Number\":\"referenceNumber\",\"Amount\":\"amount\",\"Date\":\"date\"}"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/upload"
+      }
+    },
+    {
+      "name": "Upload - Job Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/upload/{{uploadJobId}}"
+      }
+    },
+    {
+      "name": "Reconciliation - Trigger",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"uploadJobId\": \"{{uploadJobId}}\",\n  \"matchingConfig\": {\n    \"partial\": {\n      \"variancePercent\": 2\n    }\n  }\n}"
+        },
+        "url": "{{baseUrl}}/reconciliation/trigger"
+      }
+    },
+    {
+      "name": "Reconciliation - Results",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/reconciliation/results?uploadJobId={{uploadJobId}}"
+      }
+    },
+    {
+      "name": "Reconciliation - Manual Correction",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"updates\": {\n    \"transactionId\": \"SYS-1001\",\n    \"referenceNumber\": \"REF-ALPHA-01\",\n    \"amount\": 1200,\n    \"date\": \"2026-01-02\"\n  },\n  \"status\": \"matched\",\n  \"notes\": \"Manual review\"\n}"
+        },
+        "url": "{{baseUrl}}/reconciliation/manual-correction/{{resultId}}"
+      }
+    },
+    {
+      "name": "Audit - Record Timeline",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/audit/record/{{recordId}}"
+      }
+    },
+    {
+      "name": "Dashboard - Summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/dashboard/summary"
+      }
+    }
+  ]
+}
