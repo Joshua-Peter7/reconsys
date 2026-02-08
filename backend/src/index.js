@@ -16,6 +16,14 @@ const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
@@ -24,11 +32,7 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-  })
-);
+app.use(cors());
 app.use(helmet());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
