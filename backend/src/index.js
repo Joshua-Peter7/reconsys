@@ -16,6 +16,14 @@ const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'reconsys-backend',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
